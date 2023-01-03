@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WS-client</title>
+    <script>
+        const registerEvent = function(websocket){
+            websocket.addEventListener("message", function (event) {
+                receiveMsg(event.data);
+            }); 
+            websocket.onopen = function(event) {
+                console.log("WebSocket is open now.");
+            };
+        }
+
+        let websocket = new WebSocket("ws://localhost:9001/airsim");
+        registerEvent(websocket);
+
+        const openConnection = function(){
+            if(websocket && websocket.readyState === WebSocket.CLOSED){
+                websocket = new WebSocket("ws://localhost:9001/airsim");
+                registerEvent(websocket);
+            }
+        }
+
+        const closeConnection = function(){
+            if(websocket && websocket.readyState === WebSocket.OPEN){
+                websocket.close();
+            }
+        }
+
+        const checkState = setInterval(function(){
+            if (websocket === null){
+                console.log("Wbsocket not initialed yet");
+            }
+            if (websocket.readyState === WebSocket.OPEN){
+                console.log("Wbsocket was opened");
+            }
+            if (websocket.readyState === WebSocket.CONNECTING){
+                console.log("Wbsocket is connecting");
+            }
+            if (websocket.readyState === WebSocket.CLOSING){
+                console.log("Wbsocket is closing");
+            }
+            if (websocket.readyState === WebSocket.CLOSED){
+                console.log("Wbsocket was closed");
+            }
+        }, 5000)
+
+        const sendMsg = function(){
+            const msg = document.getElementById("nameTxt").value;
+            if(msg){
+                websocket.send(msg);
+                console.log("sendMsg:" + msg);
+            }
+        }
+        const receiveMsg = function(data){
+            console.log("receiveMsg:" + data);
+            document.getElementById("container").textContent = data;
+        }
+        
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const openBtn = document.getElementById("openBtn");
+            const closeBtn = document.getElementById("closeBtn");
+            const submitBtn = document.getElementById("submitBtn");
+            openBtn.addEventListener("click", ({ target }) => {
+                openConnection();
+            });
+            closeBtn.addEventListener("click", ({ target }) => {
+                closeConnection();
+            });
+            submitBtn.addEventListener("click", ({ target }) => {
+                sendMsg();
+            });
+          });
+    </script>
+    <style>
+        body {
+            background-color: rgb(58, 134, 153);
+            width:100%;
+            flex-flow:row wrap;
+        }
+        .container {
+            font-size: 20;
+            position: relative;
+        }
+    </style>
+  </head>
+  <body>
+    <div>
+        <input type="text" id="nameTxt" placeholder="Please type your name"/>
+        <button type="button" id="openBtn">Open Connection</button>
+        <button type="button" id="closeBtn">Close Connection</button>
+        <button type="button" id="submitBtn">Submit</button>
+    </div>
+    <div id="container" class="container"></div>
+        
+  </body>
+</html>
