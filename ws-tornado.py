@@ -16,7 +16,7 @@ import uuid
 import urllib.parse
 import urllib.request
 
-os.chdir("./") # 日志写入地址
+os.chdir("./")
 logging.basicConfig(filename='as-py-client.log', level=logging.INFO) 
 logger = logging.getLogger('logger')
 
@@ -97,7 +97,7 @@ class Application(tornado.web.Application):
 class AIClient():
     def notify(self, uuid):
         try:
-            url = "http://172.28.40.148:8086/smart-estimate-ic-mock-demoroom/interface/demoroom/startClaimProcess"
+            url = "http://localhost:8088/mockServer"
             param = {}
             param['id'] = uuid
             req_json = json.dumps(param)
